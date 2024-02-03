@@ -4,7 +4,9 @@ plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.ktlintGradle) apply false
-    id("com.diffplug.spotless") version "6.19.0" apply false
+    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.hilt.gradle) apply false
+    alias(libs.plugins.ksp) apply false
 }
 true // Needed to make the Suppress annotation work for the plugins block
 subprojects {

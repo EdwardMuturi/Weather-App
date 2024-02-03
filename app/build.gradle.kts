@@ -2,6 +2,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.gradle)
 }
 
 apply(from = "../spotless.gradle")
@@ -65,7 +67,15 @@ dependencies {
 //    Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
-
+//    Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+//    Hilt and instrumented tests.
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
+//    Hilt and Robolectric tests.
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

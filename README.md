@@ -1,5 +1,14 @@
 # Weather-App
+A weather application to display the current weather at the user’s location and a 5-day forecast.
 
+Requirements:
+1. You are required to implement the Forest design provided.
+2. The forecast must be based on the user’s current location.
+3. The application should connect to the following API to collect the weather information.
+   1. https://openweathermap.org/current
+   2. https://openweathermap.org/forecast5
+4. You will be required to change the background image depending on the type of weather (Cloudy,
+   Sunny and Rainy). Please use the provided assets and icons.
 ## Project Structure
 - Data
 - Domain
