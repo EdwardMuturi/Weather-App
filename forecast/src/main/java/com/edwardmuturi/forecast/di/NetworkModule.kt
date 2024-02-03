@@ -20,8 +20,9 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp.di
+package com.edwardmuturi.forecast.di
 
+import com.edwardmuturi.forecast.data.remote.api.ForecastService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,12 +33,9 @@ import retrofit2.Retrofit
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("")
-            .build()
+    fun provideForecastService(retrofit: Retrofit): ForecastService {
+        return retrofit.create(ForecastService::class.java)
     }
 }

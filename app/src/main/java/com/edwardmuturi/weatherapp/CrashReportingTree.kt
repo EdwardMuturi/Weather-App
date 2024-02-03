@@ -22,19 +22,13 @@
  */
 package com.edwardmuturi.weatherapp
 
-import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import android.util.Log
 import timber.log.Timber
-import timber.log.Timber.Forest.plant
 
-@HiltAndroidApp
-class WeatherApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        if (BuildConfig.DEBUG) {
-            plant(Timber.DebugTree())
-        } else {
-            plant(CrashReportingTree())
+class CrashReportingTree : Timber.Tree() {
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        if (priority == Log.VERBOSE || priority == Log.DEBUG) {
+            return
         }
     }
 }

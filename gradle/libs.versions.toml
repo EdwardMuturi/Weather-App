@@ -16,6 +16,9 @@ androidxHilt = "1.1.0"
 hilt = "2.44"
 kotlinParcelizePlugin = "1.9.20"
 ksp = "1.9.20-1.0.14"
+appcompat = "1.6.1"
+material = "1.11.0"
+timber = "5.0.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -42,6 +45,10 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+#Timber
+timber = {module = "com.jakewharton.timber:timber", version.ref = "timber"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -49,6 +56,8 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ktlintGradle = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless"}
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinParcelizePlugin" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
