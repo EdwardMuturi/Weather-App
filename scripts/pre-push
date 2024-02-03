@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# <https://github.com/pinterest/ktlint> pre-push hook
+echo "*****Running Ktlint before commiting changes ******"
+
+git diff --name-only -z HEAD "origin/$(git rev-parse --abbrev-ref HEAD)" -- '*.kt' '*.kts' | ktlint --relative --patterns-from-stdin=''

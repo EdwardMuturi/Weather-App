@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# <https://github.com/pinterest/ktlint> pre-commit hook
+#echo "*****Running Ktlint******"
+
+# run ktlintFormat
+#./gradlew ktlintFormat
+
+#git diff --name-only -z --cached --relative -- '*.kt' '*.kts' | ktlint --relative --patterns-from-stdin=''
+
+
+
+echo "*********************************************************"
+echo "Running git pre-commit hook. Running ktlint Format... "
+echo "*********************************************************"
+
+# Gather the staged files - to make sure changes are saved only for these files.
+stagedFiles=$(git diff --staged --name-only)
+
+# run spotless apply
+./gradlew ktlintFormat
+
+status=$?
+
+if [ "$status" = 0 ] ; then
+    echo "Static analysis found no problems."
+    # Add staged file changes to git
+    for file in $stagedFiles; do
+      if test -f "$file"; then
+        git add $file
+      fi
+    done
+    #Exit
+    exit 0
+else
+    echo "*********************************************************"
+    echo "       ********************************************      "
+    echo 1>&2 "Spotless Apply found violations it could not fix."
+    echo "Run spotless apply in your terminal and fix the issues before trying to commit again."
+    echo "       ********************************************      "
+    echo "*********************************************************"
+    #Exit
+    exit 1
+fi
