@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
 }
 
+apply(from = "../spotless.gradle")
+
 android {
     namespace = "com.edwardmuturi.weatherapp"
     compileSdk = 34
