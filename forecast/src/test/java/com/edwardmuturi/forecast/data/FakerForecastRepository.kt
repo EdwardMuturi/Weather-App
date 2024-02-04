@@ -25,12 +25,16 @@ package com.edwardmuturi.forecast.data
 import com.edwardmuturi.forecast.data.remote.dto.FetchCurrentWeatherDataDto
 import com.edwardmuturi.forecast.data.remote.dto.FetchFiveDayForecastDto
 import com.edwardmuturi.forecast.data.sampledata.currentForecast
+import com.edwardmuturi.forecast.data.sampledata.fetchFiveDayForecastDto
 import com.edwardmuturi.forecast.domain.repository.ForeCastRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FakerForecastRepository : ForeCastRepository {
     private var result: Result<FetchCurrentWeatherDataDto?> = Result.success(currentForecast)
+    private var fiveDayForecastResult: Result<FetchFiveDayForecastDto?> = Result.success(
+        fetchFiveDayForecastDto
+    )
 
     fun setSuccessfullResult() {
         result = Result.success(currentForecast)
@@ -55,6 +59,6 @@ class FakerForecastRepository : ForeCastRepository {
         lat: String,
         lon: String
     ): Flow<Result<FetchFiveDayForecastDto?>> {
-        TODO("Not yet implemented")
+        return flow { emit(fiveDayForecastResult) }
     }
 }
