@@ -20,23 +20,19 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.forecast.data.remote.api
+package com.edwardmuturi.forecast.data.remote.dto
 
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.google.gson.annotations.SerializedName
 
-interface ForecastService {
-    @GET("data/2.5/weather")
-    suspend fun getCurrentWeatherData(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String,
-        @Query("appid") appid: String = "7aee354506b6f454102c2c087272f7c9"
-    ): ForecastService
-
-    @GET("data/2.5/forecast")
-    suspend fun getFiveDayForecast(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String,
-        @Query("appid") appid: String = "7aee354506b6f454102c2c087272f7c9"
-    ): ForecastService
-}
+data class FetchFiveDayForecastDto(
+    @SerializedName("city")
+    val city: City,
+    @SerializedName("cnt")
+    val cnt: Int,
+    @SerializedName("cod")
+    val cod: String,
+    @SerializedName("list")
+    val list: List<ForecastList>,
+    @SerializedName("message")
+    val message: Int
+)
