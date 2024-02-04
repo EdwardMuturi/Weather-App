@@ -22,11 +22,14 @@
  */
 package com.edwardmuturi.network.di
 
+import com.edwardmuturi.network.interceptor.LoggingInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -36,10 +39,30 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideOkhttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor { apiKeyAsQuery(it) }
+            .addInterceptor(LoggingInterceptor())
+            .build()
+    }
+
+    private fun apiKeyAsQuery(chain: Interceptor.Chain) = chain.proceed(
+        chain.request()
+            .newBuilder()
+            .url(
+                chain.request().url.newBuilder()
+                    .addQueryParameter("appid", "7aee354506b6f454102c2c087272f7c9").build()
+            )
+            .build()
+    )
 }

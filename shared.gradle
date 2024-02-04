@@ -2,6 +2,9 @@ dependencies {
     //    Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+//    Interceptor
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp.interceptor)
     //    Timber
     implementation(libs.timber)
     //    Hilt

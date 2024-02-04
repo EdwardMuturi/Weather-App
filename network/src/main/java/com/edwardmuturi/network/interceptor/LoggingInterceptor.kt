@@ -20,21 +20,29 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.forecast.data.remote.api
+package com.edwardmuturi.network.interceptor
 
-import retrofit2.http.GET
-import retrofit2.http.Query
+import okhttp3.Interceptor
+import okhttp3.Response
+import timber.log.Timber
 
-interface ForecastService {
-    @GET("data/2.5/weather")
-    suspend fun getCurrentWeatherData(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String
-    ): ForecastService
+class LoggingInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
 
-    @GET("data/2.5/forecast")
-    suspend fun getFiveDayForecast(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String
-    ): ForecastService
+        val time1 = System.nanoTime()
+        Timber.d("Sending request {} on {}n{}", request.url, chain.connection(), request.headers)
+
+        val response = chain.proceed(request)
+
+        val time2 = System.nanoTime()
+        Timber.d(
+            "Received response for {} in {}s",
+            response.request.url,
+            (time2 - time1) / 1e6,
+            response.headers
+        )
+
+        return response
+    }
 }

@@ -43,9 +43,15 @@ dependencies {
     //    Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
+//    Okthttp Interceptor
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp.interceptor)
 //    Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // Timber
+    implementation(libs.timber)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

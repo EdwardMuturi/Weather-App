@@ -41,6 +41,10 @@ arrangement and as you move deeper into the package the framework details are gr
 * [Retrofit](https://square.github.io/retrofit/) A type-safe HTTP client for Android and Java
 * [Coil](https://coil-kt.github.io/coil/) An image loading library for Android backed by Kotlin Coroutines.
 * [Timber](https://jakewharton.github.io/timber/docs/5.x/) a logger with a small, extensible API which provides utility on top of Android's normal Log class.
+* [Okhttp Interceptor](https://square.github.io/okhttp/features/interceptors/)  a powerful mechanism that can monitor, rewrite, and retry calls.
+
+## CI/CD
+Github actions
 
 ## Sample Screens
 
