@@ -25,7 +25,7 @@ package com.edwardmuturi.forecast.data
 import com.edwardmuturi.forecast.data.remote.api.ForecastService
 import com.edwardmuturi.forecast.data.remote.dto.FetchCurrentWeatherDataDto
 import com.edwardmuturi.forecast.data.remote.dto.FetchFiveDayForecastDto
-import com.edwardmuturi.forecast.domain.ForeCastRepository
+import com.edwardmuturi.forecast.domain.repository.ForeCastRepository
 import com.edwardmuturi.network.utils.ApiCaller.safeApiCall
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow

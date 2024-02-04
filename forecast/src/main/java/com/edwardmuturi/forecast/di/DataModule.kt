@@ -23,7 +23,7 @@
 package com.edwardmuturi.forecast.di
 
 import com.edwardmuturi.forecast.data.ForecastRepositoryImpl
-import com.edwardmuturi.forecast.domain.ForeCastRepository
+import com.edwardmuturi.forecast.domain.repository.ForeCastRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

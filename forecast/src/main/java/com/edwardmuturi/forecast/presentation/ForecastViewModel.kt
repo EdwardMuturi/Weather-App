@@ -24,7 +24,7 @@ package com.edwardmuturi.forecast.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.edwardmuturi.forecast.domain.ForeCastRepository
+import com.edwardmuturi.forecast.domain.repository.ForeCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
