@@ -36,11 +36,29 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.5"
+    }
 }
 
 dependencies {
+    implementation(project(":network"))
+
+//    Compose
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation(libs.lifecycle.compose)
+    implementation(libs.viewmodel.compose)
 
     implementation(libs.core.ktx)
+    implementation(libs.viewmodel.scope)
     implementation(libs.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)

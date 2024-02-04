@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
-//    kotlin("kapt")
     alias(libs.plugins.hilt.gradle)
 }
 
@@ -60,7 +59,7 @@ android {
 }
 
 dependencies {
-    project(":network")
+    implementation(project(":forecast"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
