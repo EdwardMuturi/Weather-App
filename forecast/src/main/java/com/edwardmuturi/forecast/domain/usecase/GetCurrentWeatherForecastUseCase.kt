@@ -39,23 +39,45 @@ class GetCurrentWeatherForecastUseCase @Inject constructor(
                     val forecastResult = result.getOrNull()
                     if (forecastResult != null) {
                         send(
-                            Forecast(
-                                min = forecastResult.main.tempMin,
-                                max = forecastResult.main.tempMax,
-                                type = forecastResult.weather.first().description,
-                                day = "Tuesday",
-                                location = ForecastLocation(
-                                    latitude = forecastResult.coord.lat,
-                                    longitude = forecastResult.coord.lon,
-                                    name = forecastResult.name
+                            ForecastUiState(
+                                isLoading = false,
+                                message = "Successfully fetched current weather forecast",
+                                forecast = Forecast(
+                                    min = forecastResult.main.tempMin,
+                                    max = forecastResult.main.tempMax,
+                                    type = forecastResult.weather.first().description,
+                                    day = "",
+                                    location = ForecastLocation(
+                                        latitude = forecastResult.coord.lat,
+                                        longitude = forecastResult.coord.lon,
+                                        name = forecastResult.name
+                                    )
                                 )
+                            )
+                        )
+                    } else {
+                        send(
+                            ForecastUiState(
+                                message = "No results fetched, empty results returned",
+                                isLoading = false
                             )
                         )
                     }
                 }
 
-                false -> TODO()
+                false -> send(
+                    ForecastUiState(
+                        message = result.exceptionOrNull()?.message,
+                        isLoading = false
+                    )
+                )
             }
         }
     }
 }
+
+data class ForecastUiState(
+    val isLoading: Boolean = false,
+    val message: String? = null,
+    val forecast: Forecast? = null
+)
