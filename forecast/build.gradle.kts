@@ -44,15 +44,6 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
-    //    Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-//    Hilt and instrumented tests.
-    androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.android.compiler)
-//    Hilt and Robolectric tests.
-    testImplementation(libs.hilt.android.testing)
-    kspTest(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

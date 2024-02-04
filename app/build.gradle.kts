@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.ksp)
-//    alias(libs.plugins.kotlin.kapt)
     kotlin("kapt")
     alias(libs.plugins.hilt.gradle)
 }
