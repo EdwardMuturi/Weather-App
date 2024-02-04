@@ -31,17 +31,16 @@ class LoggingInterceptor : Interceptor {
         val request = chain.request()
 
         val time1 = System.nanoTime()
-        Timber.d("Sending request {} on {}n{}", request.url, chain.connection(), request.headers)
+        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
 
         val response = chain.proceed(request)
 
         val time2 = System.nanoTime()
         Timber.d(
-            "Received response for {} in {}s",
-            response.request.url,
-            (time2 - time1) / 1e6,
-            response.headers
+            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
+                " ${response.headers}"
         )
+        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
 
         return response
     }
