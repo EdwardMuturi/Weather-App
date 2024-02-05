@@ -31,7 +31,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     LaunchedEffect(key1 = true, block = {
-        forecastViewModel.loadCurrentDayForecast()
+        forecastViewModel.loadCurrentDayForecast(latitude = 44.34, longitude = 10.99)
+        forecastViewModel.loadFiveDayForecast(latitude = 44.34, longitude = 10.99)
     })
     Scaffold {
         Text(text = "Hello Forecast")

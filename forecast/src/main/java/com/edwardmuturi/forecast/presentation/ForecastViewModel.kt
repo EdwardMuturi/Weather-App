@@ -22,26 +22,45 @@
  */
 package com.edwardmuturi.forecast.presentation
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.edwardmuturi.forecast.domain.usecase.FiveDayForecastUiState
+import com.edwardmuturi.forecast.domain.usecase.ForecastUiState
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
+import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @HiltViewModel
 class ForecastViewModel @Inject constructor(
-    private val getCurrentWeatherForecastUseCase: GetCurrentWeatherForecastUseCase
-) :
-    ViewModel() {
-    fun loadCurrentDayForecast() {
+    private val getCurrentWeatherForecastUseCase: GetCurrentWeatherForecastUseCase,
+    private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase
+) : ViewModel() {
+    private val _currentForecastUiState: MutableState<ForecastUiState> = mutableStateOf(ForecastUiState())
+    val currentForecastUiState: State<ForecastUiState> = _currentForecastUiState
+
+    private val _fiveDayForecastUiState: MutableState<FiveDayForecastUiState> = mutableStateOf(FiveDayForecastUiState())
+    val fiveDayForecastUiState: State<FiveDayForecastUiState> = _fiveDayForecastUiState
+
+    fun loadCurrentDayForecast(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            getCurrentWeatherForecastUseCase(lat = "44.34", lon = "10.99")
+            getCurrentWeatherForecastUseCase(lat = latitude.toString(), lon = longitude.toString())
                 .collectLatest {
-                    Timber.e("Result it $it")
+                    _currentForecastUiState.value = it
                 }
+        }
+    }
+
+    fun loadFiveDayForecast(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            getFiveDayWeatherForecastUseCase(lat = latitude, lon = longitude).collectLatest {
+                _fiveDayForecastUiState.value = it
+            }
         }
     }
 }
