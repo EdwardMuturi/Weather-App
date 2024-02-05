@@ -22,50 +22,33 @@
  */
 package com.edwardmuturi.forecast.presentation
 
-import com.edwardmuturi.forecast.MainDispatcherRule
-import com.edwardmuturi.forecast.data.FakerForecastRepository
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import com.edwardmuturi.forecast.FakerForecastRepository
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
 import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ForecastViewModelTest {
+class ForecastScreenTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
     private val fakerForecastRepository = FakerForecastRepository()
     private val getFiveDayWeatherForecastUseCase =
         GetFiveDayWeatherForecastUseCase(fakerForecastRepository)
     private val getCurrentWeatherForecastUseCase =
         GetCurrentWeatherForecastUseCase(fakerForecastRepository)
-    private lateinit var viewModel: ForecastViewModel
-
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
-
-    @Before
-    fun setUp() {
-        viewModel = ForecastViewModel(getCurrentWeatherForecastUseCase, getFiveDayWeatherForecastUseCase)
-    }
+    private val viewModel: ForecastViewModel =
+        ForecastViewModel(getCurrentWeatherForecastUseCase, getFiveDayWeatherForecastUseCase)
 
     @Test
-    fun `load current weather forecast ui state successfully`() {
-        val lat = 44.34
-        val lon = 10.99
+    fun display_five_day_forecast() {
+        composeTestRule.setContent {
+            ForecastScreen(forecastViewModel = viewModel)
+        }
 
-        viewModel.loadCurrentDayForecast(latitude = lat, longitude = lon)
-
-        assert(viewModel.currentForecastUiState.value.forecast?.location?.latitude == lat)
-    }
-
-    @Test
-    fun `load 5 day weather forecast ui state successfully`() {
-        val lat = 44.34
-        val lon = 10.99
-
-        viewModel.loadFiveDayForecast(latitude = lat, longitude = lon)
-
-        assert(
-            viewModel.fiveDayForecastUiState.value.forecasts.isNotEmpty() &&
-                viewModel.fiveDayForecastUiState.value.forecasts.first().location.latitude == lat
-        )
+        composeTestRule.onNodeWithTag("ForecastParentColumn").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("FiveDayForecastColumn").assertIsDisplayed()
     }
 }

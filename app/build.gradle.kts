@@ -77,7 +77,3 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 }
-// // Allow references to generated code
-// kapt {
-//    correctErrorTypes = true
-// }

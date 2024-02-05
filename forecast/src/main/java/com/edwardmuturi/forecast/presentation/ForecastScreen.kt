@@ -22,10 +22,15 @@
  */
 package com.edwardmuturi.forecast.presentation
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
@@ -35,6 +40,9 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
         forecastViewModel.loadFiveDayForecast(latitude = 44.34, longitude = 10.99)
     })
     Scaffold {
-        Text(text = "Hello Forecast")
+        Column(Modifier.fillMaxSize().padding(it).testTag("ForecastParentColumn")) {
+            LazyColumn(Modifier.testTag("FiveDayForecastColumn")) {
+            }
+        }
     }
 }

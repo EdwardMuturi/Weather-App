@@ -5,6 +5,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="display_five_day_forecast()">
+        <State />
+      </entry>
     </value>
   </component>
 </project>
