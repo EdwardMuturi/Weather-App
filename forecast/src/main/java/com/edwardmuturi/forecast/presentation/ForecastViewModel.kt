@@ -41,10 +41,12 @@ class ForecastViewModel @Inject constructor(
     private val getCurrentWeatherForecastUseCase: GetCurrentWeatherForecastUseCase,
     private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase
 ) : ViewModel() {
-    private val _currentForecastUiState: MutableState<ForecastUiState> = mutableStateOf(ForecastUiState())
+    private val _currentForecastUiState: MutableState<ForecastUiState> =
+        mutableStateOf(ForecastUiState())
     val currentForecastUiState: State<ForecastUiState> = _currentForecastUiState
 
-    private val _fiveDayForecastUiState: MutableState<FiveDayForecastUiState> = mutableStateOf(FiveDayForecastUiState())
+    private val _fiveDayForecastUiState: MutableState<FiveDayForecastUiState> =
+        mutableStateOf(FiveDayForecastUiState())
     val fiveDayForecastUiState: State<FiveDayForecastUiState> = _fiveDayForecastUiState
 
     fun loadCurrentDayForecast(latitude: Double, longitude: Double) {

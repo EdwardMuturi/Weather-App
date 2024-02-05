@@ -10,8 +10,10 @@ import org.junit.Test
 
 class ForecastViewModelTest {
     private val fakerForecastRepository = FakerForecastRepository()
-    private val getFiveDayWeatherForecastUseCase = GetFiveDayWeatherForecastUseCase(fakerForecastRepository)
-    private val getCurrentWeatherForecastUseCase = GetCurrentWeatherForecastUseCase(fakerForecastRepository)
+    private val getFiveDayWeatherForecastUseCase =
+        GetFiveDayWeatherForecastUseCase(fakerForecastRepository)
+    private val getCurrentWeatherForecastUseCase =
+        GetCurrentWeatherForecastUseCase(fakerForecastRepository)
     private lateinit var viewModel: ForecastViewModel
 
     @get:Rule
