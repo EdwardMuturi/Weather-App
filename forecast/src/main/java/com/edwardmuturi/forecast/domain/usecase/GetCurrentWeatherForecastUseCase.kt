@@ -45,6 +45,7 @@ class GetCurrentWeatherForecastUseCase @Inject constructor(
                                 forecast = Forecast(
                                     min = forecastResult.main.tempMin,
                                     max = forecastResult.main.tempMax,
+                                    currentTemp = forecastResult.main.feelsLike,
                                     type = forecastResult.weather.first().description,
                                     day = "",
                                     location = ForecastLocation(

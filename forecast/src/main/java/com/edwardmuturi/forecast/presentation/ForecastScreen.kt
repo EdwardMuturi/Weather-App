@@ -22,27 +22,152 @@
  */
 package com.edwardmuturi.forecast.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.edwardmuturi.forecast.R
+import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
-    LaunchedEffect(key1 = true, block = {
+    val fiveDayForecastUiState by forecastViewModel.fiveDayForecastUiState
+    val currentDayForecastUiState by forecastViewModel.currentForecastUiState
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = currentDayForecastUiState.isLoading, block = {
         forecastViewModel.loadCurrentDayForecast(latitude = 44.34, longitude = 10.99)
         forecastViewModel.loadFiveDayForecast(latitude = 44.34, longitude = 10.99)
     })
-    Scaffold {
-        Column(Modifier.fillMaxSize().padding(it).testTag("ForecastParentColumn")) {
-            LazyColumn(Modifier.testTag("FiveDayForecastColumn")) {
+
+    Scaffold(containerColor = Color(0xff54717A)) {
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .padding(it)
+                .testTag("FiveDayForecastColumn")
+        ) {
+            stickyHeader {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        painter = painterResource(id = R.drawable.forest_cloudy),
+                        contentDescription = stringResource(R.string.text_weather_type_image),
+                        modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
+                        contentScale = ContentScale.Crop
+                    )
+                    Column(Modifier.align(Alignment.Center)) {
+                        Text(
+                            text = currentDayForecastUiState.forecast?.currentTemp.toString()
+                                .plus(context.getString(R.string.degree_symbol)),
+                            fontSize = 52.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 50.dp)
+                        )
+
+                        Text(
+                            text = currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
+                            fontSize = 27.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
+
+            item {
+                CurrentDayForecastRow(
+                    minTemp = currentDayForecastUiState.forecast?.min.toString(),
+                    currentTemp = currentDayForecastUiState.forecast?.currentTemp.toString(),
+                    maxTemp = currentDayForecastUiState.forecast?.max.toString()
+                )
+                Spacer(modifier = Modifier.fillMaxWidth().size(2.dp).background(color = Color.White))
+            }
+
+            itemsIndexed(fiveDayForecastUiState.forecasts.take(5)) { i, forecast ->
+                ForecastRow(
+                    day = getNextFiveDays()[i],
+                    weatherImage = R.drawable.rain,
+                    weatherType = forecast.type,
+                    maxTemp = forecast.max.toString()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ForecastRow(day: String, weatherImage: Int, weatherType: String, maxTemp: String) {
+    Row(
+        Modifier.fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(day, modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = weatherImage),
+            contentDescription = weatherType + "Image",
+            modifier = Modifier.size(30.dp).weight(1f)
+        )
+        Text(
+            maxTemp.plus(LocalContext.current.getString(R.string.degree_symbol)),
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
+        )
+    }
+}
+
+@Composable
+private fun CurrentDayForecastRow(minTemp: String, currentTemp: String, maxTemp: String) {
+    Row(
+        Modifier.fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val context = LocalContext.current
+        Column {
+            Text(minTemp + context.getString(R.string.degree_symbol))
+            Text("min")
+        }
+
+        Column {
+            Text(currentTemp.plus(context.getString(R.string.degree_symbol)))
+            Text("Current")
+        }
+
+        Column {
+            Text(maxTemp.plus(context.getString(R.string.degree_symbol)))
+            Text("max")
         }
     }
 }

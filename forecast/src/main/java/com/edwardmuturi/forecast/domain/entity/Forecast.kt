@@ -27,6 +27,7 @@ import com.edwardmuturi.location.domain.entity.ForecastLocation
 data class Forecast(
     val type: String,
     val min: Double,
+    val currentTemp: Double,
     val max: Double,
     val day: String,
     val location: ForecastLocation

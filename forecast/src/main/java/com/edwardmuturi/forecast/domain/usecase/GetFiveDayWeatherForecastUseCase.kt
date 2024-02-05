@@ -48,6 +48,7 @@ class GetFiveDayWeatherForecastUseCase @Inject constructor(
                                             type = f.weather.first().description,
                                             min = f.main.tempMin,
                                             max = f.main.tempMax,
+                                            currentTemp = f.main.feelsLike,
                                             day = "",
                                             location = ForecastLocation(
                                                 latitude = fiveDayForecast.city.coord.lat,

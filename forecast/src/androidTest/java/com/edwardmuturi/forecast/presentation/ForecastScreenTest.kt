@@ -24,10 +24,12 @@ package com.edwardmuturi.forecast.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import com.edwardmuturi.forecast.FakerForecastRepository
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
 import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -42,13 +44,41 @@ class ForecastScreenTest {
     private val viewModel: ForecastViewModel =
         ForecastViewModel(getCurrentWeatherForecastUseCase, getFiveDayWeatherForecastUseCase)
 
-    @Test
-    fun display_five_day_forecast() {
+    @Before
+    fun setUp() {
         composeTestRule.setContent {
             ForecastScreen(forecastViewModel = viewModel)
         }
+    }
 
-        composeTestRule.onNodeWithTag("ForecastParentColumn").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("FiveDayForecastColumn").assertIsDisplayed()
+    @Test
+    fun display_weather_type_image() {
+        val weatherTypeSample = "moderate rain".uppercase()
+        composeTestRule.onNodeWithContentDescription("weatherTypeImage").assertIsDisplayed()
+        composeTestRule.onNodeWithText(weatherTypeSample).assertIsDisplayed()
+    }
+
+    @Test
+    fun display_current_forecast() {
+        val sampleMaxTemperatureFromSampleResponse = "300.05°"
+        val sampleMinTemperatureFromSampleResponse = "297.56°"
+        val sampleCurrentTemperatureFromSampleResponse = "298.74°"
+
+        composeTestRule.onNodeWithText(sampleMaxTemperatureFromSampleResponse).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sampleCurrentTemperatureFromSampleResponse).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sampleMinTemperatureFromSampleResponse).assertIsDisplayed()
+    }
+
+    @Test
+    fun display_five_day_forecast() {
+        val sampleMaxTemperatureFromSampleResponse = "297.87°"
+        val sampleMaxTemperatureFromSampleResponse1 = "295.45°"
+        val sampleMaxTemperatureFromSampleResponse2 = "292.46°"
+        val sampleMaxTemperatureFromSampleResponse3 = "294.93°"
+
+        composeTestRule.onNodeWithText(sampleMaxTemperatureFromSampleResponse).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sampleMaxTemperatureFromSampleResponse1).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sampleMaxTemperatureFromSampleResponse2).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sampleMaxTemperatureFromSampleResponse3).assertIsDisplayed()
     }
 }
