@@ -33,10 +33,7 @@ import kotlinx.coroutines.flow.flow
 
 class ForecastRepositoryImpl @Inject constructor(private val forecastService: ForecastService) :
     ForeCastRepository {
-    override fun getCurrentDayForecast(
-        lat: String,
-        lon: String
-    ): Flow<Result<FetchCurrentWeatherDataDto?>> {
+    override fun getCurrentDayForecast(lat: String, lon: String): Flow<Result<FetchCurrentWeatherDataDto?>> {
         return flow {
             val result = safeApiCall {
                 forecastService.getCurrentWeatherData(
@@ -48,10 +45,7 @@ class ForecastRepositoryImpl @Inject constructor(private val forecastService: Fo
         }
     }
 
-    override fun getFiveDayForecast(
-        lat: String,
-        lon: String
-    ): Flow<Result<FetchFiveDayForecastDto?>> {
+    override fun getFiveDayForecast(lat: String, lon: String): Flow<Result<FetchFiveDayForecastDto?>> {
         return flow {
             val result = safeApiCall {
                 forecastService.getFiveDayForecast(

@@ -42,23 +42,19 @@ class FakerForecastRepository : ForeCastRepository {
 
     fun setSuccessfullNullResult() {
         result = Result.success(null)
+        fiveDayForecastResult = Result.success(null)
     }
 
     fun setErrorResult() {
         result = Result.failure(Exception("Failed to parse response body"))
+        fiveDayForecastResult = Result.failure(Exception("502 Bad Gateway Error"))
     }
 
-    override fun getCurrentDayForecast(
-        lat: String,
-        lon: String
-    ): Flow<Result<FetchCurrentWeatherDataDto?>> {
+    override fun getCurrentDayForecast(lat: String, lon: String): Flow<Result<FetchCurrentWeatherDataDto?>> {
         return flow { emit(result) }
     }
 
-    override fun getFiveDayForecast(
-        lat: String,
-        lon: String
-    ): Flow<Result<FetchFiveDayForecastDto?>> {
+    override fun getFiveDayForecast(lat: String, lon: String): Flow<Result<FetchFiveDayForecastDto?>> {
         return flow { emit(fiveDayForecastResult) }
     }
 }

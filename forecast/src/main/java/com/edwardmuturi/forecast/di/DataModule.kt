@@ -35,7 +35,5 @@ import javax.inject.Singleton
 abstract class DataModule {
     @Binds
     @Singleton
-    abstract fun provideForecastRepository(
-        forecastRepositoryImpl: ForecastRepositoryImpl
-    ): ForeCastRepository
+    abstract fun provideForecastRepository(forecastRepositoryImpl: ForecastRepositoryImpl): ForeCastRepository
 }
