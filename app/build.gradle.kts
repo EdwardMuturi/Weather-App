@@ -60,6 +60,7 @@ android {
 
 dependencies {
     implementation(project(":forecast"))
+    implementation(project(":location"))
 
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
