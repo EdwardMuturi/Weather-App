@@ -47,7 +47,11 @@ class ForecastScreenTest {
     @Before
     fun setUp() {
         composeTestRule.setContent {
-            ForecastScreen(forecastViewModel = viewModel)
+            val locationDetails = LocationDetails(
+                latitude = 44.34,
+                longitude = 10.99
+            )
+            ForecastScreen(locationDetails = locationDetails, forecastViewModel = viewModel)
         }
     }
 
