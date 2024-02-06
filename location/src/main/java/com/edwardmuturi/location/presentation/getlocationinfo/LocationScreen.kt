@@ -107,9 +107,7 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 
                 Lifecycle.Event.ON_RESUME -> {
                     Timber.d("On Resume")
-                    if (locationRequired) {
-                        startLocationUpdates(locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
-                    }
+                    startLocationUpdates(locationRequired, locationCallback, fusedLocationClient)
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
@@ -138,14 +136,16 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 }
 
 @SuppressLint("MissingPermission")
-fun startLocationUpdates(locationCallback: LocationCallback?, fusedLocationClient: FusedLocationProviderClient?) {
-    locationCallback?.let {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+private fun startLocationUpdates(locationRequired: Boolean, locationCallback: LocationCallback?, fusedLocationClient: FusedLocationProviderClient?) {
+    if (locationRequired) {
+        locationCallback?.let {
+            val locationRequest = LocationRequest.create().apply {
+                interval = 10000
+                fastestInterval = 5000
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            }
+            fusedLocationClient?.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
         }
-        fusedLocationClient?.requestLocationUpdates(locationRequest, it, Looper.getMainLooper())
     }
 }
 
