@@ -30,8 +30,16 @@ import retrofit2.http.Query
 
 interface ForecastService {
     @GET("data/2.5/weather")
-    suspend fun getCurrentWeatherData(@Query("lat") lat: String, @Query("lon") lon: String): Response<FetchCurrentWeatherDataDto>
+    suspend fun getCurrentWeatherData(
+        @Query("lat") lat: String,
+        @Query("lon") lon: String,
+        @Query("units") units: String = "metric"
+    ): Response<FetchCurrentWeatherDataDto>
 
     @GET("data/2.5/forecast")
-    suspend fun getFiveDayForecast(@Query("lat") lat: String, @Query("lon") lon: String): Response<FetchFiveDayForecastDto>
+    suspend fun getFiveDayForecast(
+        @Query("lat") lat: String,
+        @Query("lon") lon: String,
+        @Query("units") units: String = "metric"
+    ): Response<FetchFiveDayForecastDto>
 }
