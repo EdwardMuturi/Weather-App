@@ -20,28 +20,26 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.network.interceptor
+package com.edwardmuturi.network.utils
 
-import okhttp3.Interceptor
-import okhttp3.Response
-import timber.log.Timber
+import java.lang.Exception
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+object ApiCaller {
+    suspend fun <T> safeApiCall(apiCall: suspend () -> Response<T>): Result<T?> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val result = apiCall()
 
-        val time1 = System.nanoTime()
-        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
-
-        val response = chain.proceed(request)
-
-        val time2 = System.nanoTime()
-        Timber.d(
-            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
-                " ${response.headers}"
-        )
-        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
-
-        return response
+                when (result.isSuccessful) {
+                    true -> Result.success(result.body())
+                    false -> Result.failure(IllegalStateException(result.message()))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
     }
 }

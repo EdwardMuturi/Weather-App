@@ -20,28 +20,10 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.network.interceptor
+package com.edwardmuturi.location.domain.entity
 
-import okhttp3.Interceptor
-import okhttp3.Response
-import timber.log.Timber
-
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-
-        val time1 = System.nanoTime()
-        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
-
-        val response = chain.proceed(request)
-
-        val time2 = System.nanoTime()
-        Timber.d(
-            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
-                " ${response.headers}"
-        )
-        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
-
-        return response
-    }
-}
+data class ForecastLocation(
+    val latitude: Double,
+    val longitude: Double,
+    val name: String?
+)

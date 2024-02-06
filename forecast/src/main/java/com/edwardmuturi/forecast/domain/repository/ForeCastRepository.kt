@@ -20,28 +20,14 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.network.interceptor
+package com.edwardmuturi.forecast.domain.repository
 
-import okhttp3.Interceptor
-import okhttp3.Response
-import timber.log.Timber
+import com.edwardmuturi.forecast.data.remote.dto.FetchCurrentWeatherDataDto
+import com.edwardmuturi.forecast.data.remote.dto.FetchFiveDayForecastDto
+import kotlinx.coroutines.flow.Flow
 
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+interface ForeCastRepository {
 
-        val time1 = System.nanoTime()
-        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
-
-        val response = chain.proceed(request)
-
-        val time2 = System.nanoTime()
-        Timber.d(
-            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
-                " ${response.headers}"
-        )
-        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
-
-        return response
-    }
+    fun getCurrentDayForecast(lat: String, lon: String): Flow<Result<FetchCurrentWeatherDataDto?>>
+    fun getFiveDayForecast(lat: String, lon: String): Flow<Result<FetchFiveDayForecastDto?>>
 }
