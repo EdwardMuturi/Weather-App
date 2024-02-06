@@ -20,26 +20,40 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.forecast.data.remote.api
+package com.edwardmuturi.forecast.data
 
+import com.edwardmuturi.forecast.data.remote.api.ForecastService
 import com.edwardmuturi.forecast.data.remote.dto.FetchCurrentWeatherDataDto
 import com.edwardmuturi.forecast.data.remote.dto.FetchFiveDayForecastDto
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.edwardmuturi.forecast.domain.repository.ForeCastRepository
+import com.edwardmuturi.network.utils.ApiCaller.safeApiCall
+import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-interface ForecastService {
-    @GET("data/2.5/weather")
-    suspend fun getCurrentWeatherData(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String,
-        @Query("units") units: String = "metric"
-    ): Response<FetchCurrentWeatherDataDto>
+class ForecastRepositoryImpl @Inject constructor(private val forecastService: ForecastService) :
+    ForeCastRepository {
+    override fun getCurrentDayForecast(lat: String, lon: String): Flow<Result<FetchCurrentWeatherDataDto?>> {
+        return flow {
+            val result = safeApiCall {
+                forecastService.getCurrentWeatherData(
+                    lat = lat,
+                    lon = lon
+                )
+            }
+            emit(result)
+        }
+    }
 
-    @GET("data/2.5/forecast")
-    suspend fun getFiveDayForecast(
-        @Query("lat") lat: String,
-        @Query("lon") lon: String,
-        @Query("units") units: String = "metric"
-    ): Response<FetchFiveDayForecastDto>
+    override fun getFiveDayForecast(lat: String, lon: String): Flow<Result<FetchFiveDayForecastDto?>> {
+        return flow {
+            val result = safeApiCall {
+                forecastService.getFiveDayForecast(
+                    lat = lat,
+                    lon = lon
+                )
+            }
+            emit(result)
+        }
+    }
 }

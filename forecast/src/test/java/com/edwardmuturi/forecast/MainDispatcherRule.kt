@@ -20,28 +20,27 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.network.interceptor
+package com.edwardmuturi.forecast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
-import okhttp3.Interceptor
-import okhttp3.Response
-import timber.log.Timber
+@OptIn(ExperimentalCoroutinesApi::class)
+class MainDispatcherRule(
+    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
+) : TestWatcher() {
+    override fun starting(description: Description) {
+        super.starting(description)
+        Dispatchers.setMain(testDispatcher)
+    }
 
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-
-        val time1 = System.nanoTime()
-        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
-
-        val response = chain.proceed(request)
-
-        val time2 = System.nanoTime()
-        Timber.d(
-            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
-                " ${response.headers}"
-        )
-        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
-
-        return response
+    override fun finished(description: Description) {
+        super.finished(description)
+        Dispatchers.resetMain()
     }
 }

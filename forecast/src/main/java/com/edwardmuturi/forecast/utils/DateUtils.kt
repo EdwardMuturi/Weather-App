@@ -20,28 +20,23 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.network.interceptor
+package com.edwardmuturi.forecast.utils
 
-import okhttp3.Interceptor
-import okhttp3.Response
-import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
-class LoggingInterceptor : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
+object DateUtils {
+    fun getNextFiveDays(): List<String> {
+        val dateFormat = SimpleDateFormat("EEEE")
+        val calendar = Calendar.getInstance()
 
-        val time1 = System.nanoTime()
-        Timber.d("Sending request ${request.url} on ${chain.connection()}n${request.headers}")
+        val nextFiveDays = mutableListOf<String>()
 
-        val response = chain.proceed(request)
+        repeat(5) {
+            calendar.add(Calendar.DAY_OF_WEEK, 1)
+            nextFiveDays.add(dateFormat.format(calendar.time))
+        }
 
-        val time2 = System.nanoTime()
-        Timber.d(
-            "Received response for ${response.request.url} in ${(time2 - time1) / 1e6}s," +
-                " ${response.headers}"
-        )
-        Timber.d("Response ${response.peekBody(Int.MAX_VALUE.toLong()).string()}")
-
-        return response
+        return nextFiveDays
     }
 }
