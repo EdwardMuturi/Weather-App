@@ -72,7 +72,7 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
         val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
         if (areGranted) {
             locationRequired = true
-            startLocationUpdates(locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
+            startLocationUpdates(locationRequired = locationRequired, locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
@@ -87,7 +87,7 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     ) {
-        startLocationUpdates(locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
+        startLocationUpdates(locationRequired = locationRequired, locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
     } else {
         LaunchedEffect(key1 = true, block = {
             launcherMultiplePermissions.launch(permissions)
