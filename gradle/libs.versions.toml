@@ -23,6 +23,7 @@ okhttp = "4.12.0"
 viewmodel-scope = "2.4.0"
 lifecycle-version = "2.7.0"
 coroutines = "1.8.0-RC2"
+location = "21.1.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -62,7 +63,8 @@ viewmodel-scope = {module = "androidx.lifecycle:lifecycle-viewmodel-ktx", versio
 viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-version"}
 #Coroutines test
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-
+# Location
+location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "location"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

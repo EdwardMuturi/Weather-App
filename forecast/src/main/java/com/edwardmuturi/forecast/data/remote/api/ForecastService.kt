@@ -32,12 +32,14 @@ interface ForecastService {
     @GET("data/2.5/weather")
     suspend fun getCurrentWeatherData(
         @Query("lat") lat: String,
-        @Query("lon") lon: String
+        @Query("lon") lon: String,
+        @Query("units") units: String = "metric"
     ): Response<FetchCurrentWeatherDataDto>
 
     @GET("data/2.5/forecast")
     suspend fun getFiveDayForecast(
         @Query("lat") lat: String,
-        @Query("lon") lon: String
+        @Query("lon") lon: String,
+        @Query("units") units: String = "metric"
     ): Response<FetchFiveDayForecastDto>
 }

@@ -59,14 +59,20 @@ import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
+fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: ForecastViewModel = viewModel()) {
     val fiveDayForecastUiState by forecastViewModel.fiveDayForecastUiState
     val currentDayForecastUiState by forecastViewModel.currentForecastUiState
     val context = LocalContext.current
 
     LaunchedEffect(key1 = currentDayForecastUiState.isLoading, block = {
-        forecastViewModel.loadCurrentDayForecast(latitude = 44.34, longitude = 10.99)
-        forecastViewModel.loadFiveDayForecast(latitude = 44.34, longitude = 10.99)
+        forecastViewModel.loadCurrentDayForecast(
+            latitude = latitude,
+            longitude = longitude
+        )
+        forecastViewModel.loadFiveDayForecast(
+            latitude = latitude,
+            longitude = longitude
+        )
     })
 
     Scaffold(containerColor = Color(0xff54717A)) {

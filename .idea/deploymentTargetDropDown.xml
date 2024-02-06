@@ -8,6 +8,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="display_current_forecast()">
+        <State />
+      </entry>
       <entry key="display_five_day_forecast()">
         <State />
       </entry>
