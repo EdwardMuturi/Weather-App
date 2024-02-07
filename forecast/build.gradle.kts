@@ -47,6 +47,7 @@ android {
 dependencies {
     implementation(project(":network"))
     implementation(project(":location"))
+    implementation(project(":storage"))
 
 //    Compose
     implementation(libs.activity.compose)
