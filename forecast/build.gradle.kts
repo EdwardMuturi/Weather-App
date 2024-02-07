@@ -57,11 +57,11 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.lifecycle.compose)
     implementation(libs.viewmodel.compose)
+    implementation(libs.material.compose)
 
     implementation(libs.core.ktx)
     implementation(libs.viewmodel.scope)
     implementation(libs.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
