@@ -72,6 +72,10 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
             latitude = latitude,
             longitude = longitude
         )
+        forecastViewModel.loadFiveDayForecast(
+            latitude = latitude,
+            longitude = longitude
+        )
     })
 
     LaunchedEffect(key1 = currentDayForecastUiState.isLoading, block = {
