@@ -64,6 +64,7 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
             for (location in p0.locations) {
                 currentLocation = LocationDetails(location.latitude, location.longitude)
                 onLocationUpdated(currentLocation)
+                Timber.e("sent location $currentLocation")
             }
         }
     }

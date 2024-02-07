@@ -44,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,55 +65,46 @@ import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: ForecastViewModel = viewModel()) {
-    val fiveDayForecastUiState by forecastViewModel.fiveDayForecastUiState
-    val currentDayForecastUiState by forecastViewModel.currentForecastUiState
+    val forecastScreenUiState by forecastViewModel.forecastUiState.collectAsState()
     val context = LocalContext.current
-    val pullRefreshState = rememberPullRefreshState(refreshing = currentDayForecastUiState.isLoading, onRefresh = {
-        forecastViewModel.loadCurrentDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
-        forecastViewModel.loadFiveDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
-    })
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = forecastScreenUiState.isLoading,
+        onRefresh = { forecastViewModel.loadForecast(latitude, longitude) }
+    )
 
-    LaunchedEffect(key1 = currentDayForecastUiState.isLoading, block = {
-        forecastViewModel.loadCurrentDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
-        forecastViewModel.loadFiveDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
-    })
+    LaunchedEffect(
+        key1 = forecastScreenUiState.isLoading,
+        block = {
+            forecastViewModel.loadForecast(latitude, longitude)
+        }
+    )
 
-    Scaffold(containerColor = Color(0xff54717A)) {
+    Scaffold(containerColor = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type)) {
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(it)
                 .pullRefresh(pullRefreshState)
         ) {
-            if (!currentDayForecastUiState.isLoading) {
+            if (!forecastScreenUiState.isLoading) {
                 LazyColumn(
                     Modifier
                         .fillMaxSize()
-                        .testTag("FiveDayForecastColumn")
+                        .testTag("ForecastColumn")
                 ) {
                     stickyHeader {
                         Box(modifier = Modifier.fillMaxWidth()) {
                             Image(
-                                painter = painterResource(id = R.drawable.forest_cloudy),
+                                painter = painterResource(id = getBackgroundImage(forecastScreenUiState.currentDayForecastUiState.forecast?.type)),
                                 contentDescription = stringResource(R.string.text_weather_type_image),
-                                modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.TopCenter),
                                 contentScale = ContentScale.Crop
                             )
                             Column(Modifier.align(Alignment.Center)) {
                                 Text(
-                                    text = currentDayForecastUiState.forecast?.currentTemp.toString()
+                                    text = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString()
                                         .plus(context.getString(R.string.degree_symbol)),
                                     fontSize = 52.sp,
                                     fontWeight = FontWeight.Bold,
@@ -120,7 +112,7 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
                                 )
 
                                 Text(
-                                    text = currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
+                                    text = forecastScreenUiState.currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
                                     fontSize = 27.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -130,17 +122,22 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
 
                     item {
                         CurrentDayForecastRow(
-                            minTemp = currentDayForecastUiState.forecast?.min.toString(),
-                            currentTemp = currentDayForecastUiState.forecast?.currentTemp.toString(),
-                            maxTemp = currentDayForecastUiState.forecast?.max.toString()
+                            minTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.min.toString(),
+                            currentTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString(),
+                            maxTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.max.toString()
                         )
-                        Spacer(modifier = Modifier.fillMaxWidth().size(2.dp).background(color = Color.White))
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .size(2.dp)
+                                .background(color = Color.White)
+                        )
                     }
 
-                    itemsIndexed(fiveDayForecastUiState.forecasts.take(5)) { i, forecast ->
+                    itemsIndexed(forecastScreenUiState.fiveDayForecastUiState.forecasts) { i, forecast ->
                         ForecastRow(
                             day = getNextFiveDays()[i],
-                            weatherImage = R.drawable.rain,
+                            weatherImage = getWeatherIcon(forecast.type),
                             weatherType = forecast.type,
                             maxTemp = forecast.max.toString()
                         )
@@ -149,7 +146,7 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
             }
 
             PullRefreshIndicator(
-                refreshing = currentDayForecastUiState.isLoading,
+                refreshing = forecastScreenUiState.isLoading,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
@@ -160,7 +157,8 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
 @Composable
 private fun ForecastRow(day: String, weatherImage: Int, weatherType: String, maxTemp: String) {
     Row(
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -169,7 +167,9 @@ private fun ForecastRow(day: String, weatherImage: Int, weatherType: String, max
         Image(
             painter = painterResource(id = weatherImage),
             contentDescription = weatherType + "Image",
-            modifier = Modifier.size(30.dp).weight(1f)
+            modifier = Modifier
+                .size(30.dp)
+                .weight(1f)
         )
         Text(
             maxTemp.plus(LocalContext.current.getString(R.string.degree_symbol)),
@@ -182,7 +182,8 @@ private fun ForecastRow(day: String, weatherImage: Int, weatherType: String, max
 @Composable
 private fun CurrentDayForecastRow(minTemp: String, currentTemp: String, maxTemp: String) {
     Row(
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -204,4 +205,27 @@ private fun CurrentDayForecastRow(minTemp: String, currentTemp: String, maxTemp:
             Text("max")
         }
     }
+}
+
+@Composable
+private fun BackgroundColor(weatherType: String?) = when {
+    weatherType?.contains("rain", ignoreCase = true) == true -> Color(0xff57575D)
+    weatherType?.contains("sun", ignoreCase = true) == true -> Color(0xff47AB2F)
+    weatherType?.contains("cloud", ignoreCase = true) == true -> Color(0xff54717A)
+    else -> Color(0xff54717A)
+}
+
+private fun getWeatherIcon(weatherType: String) = when {
+    weatherType.contains("rain", ignoreCase = true) -> R.drawable.rain
+    weatherType.contains("clear", ignoreCase = true) -> R.drawable.clear
+    weatherType.contains("sun", ignoreCase = true) -> R.drawable.partlysunny
+    weatherType.contains("cloud", ignoreCase = true) -> R.drawable.clear
+    else -> R.drawable.partlysunny
+}
+
+private fun getBackgroundImage(weatherType: String?) = when {
+    weatherType?.contains("rain", ignoreCase = true) == true -> R.drawable.forest_rainy
+    weatherType?.contains("sun", ignoreCase = true) == true -> R.drawable.forest_sunny
+    weatherType?.contains("cloud", ignoreCase = true) == true -> R.drawable.forest_cloudy
+    else -> R.drawable.forest_cloudy
 }

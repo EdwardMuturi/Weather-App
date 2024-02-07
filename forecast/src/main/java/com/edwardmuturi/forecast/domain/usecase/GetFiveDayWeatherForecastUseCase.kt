@@ -56,7 +56,7 @@ class GetFiveDayWeatherForecastUseCase @Inject constructor(
                                                 name = fiveDayForecast.city.name
                                             )
                                         )
-                                    }
+                                    }.take(5)
                                 )
                             )
                         } else {
