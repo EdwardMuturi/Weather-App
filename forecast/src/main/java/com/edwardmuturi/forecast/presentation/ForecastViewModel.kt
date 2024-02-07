@@ -51,6 +51,7 @@ class ForecastViewModel @Inject constructor(
 
     fun loadCurrentDayForecast(latitude: Double, longitude: Double) {
         viewModelScope.launch {
+            _currentForecastUiState.value = ForecastUiState(isLoading = true)
             getCurrentWeatherForecastUseCase(lat = latitude.toString(), lon = longitude.toString())
                 .collectLatest {
                     _currentForecastUiState.value = it
@@ -60,6 +61,7 @@ class ForecastViewModel @Inject constructor(
 
     fun loadFiveDayForecast(latitude: Double, longitude: Double) {
         viewModelScope.launch {
+            _fiveDayForecastUiState.value = FiveDayForecastUiState(isLoading = true)
             getFiveDayWeatherForecastUseCase(lat = latitude, lon = longitude).collectLatest {
                 _fiveDayForecastUiState.value = it
             }

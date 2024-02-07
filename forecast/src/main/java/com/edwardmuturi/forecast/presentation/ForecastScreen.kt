@@ -36,6 +36,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,12 +61,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.edwardmuturi.forecast.R
 import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: ForecastViewModel = viewModel()) {
     val fiveDayForecastUiState by forecastViewModel.fiveDayForecastUiState
     val currentDayForecastUiState by forecastViewModel.currentForecastUiState
     val context = LocalContext.current
+    val pullRefreshState = rememberPullRefreshState(refreshing = currentDayForecastUiState.isLoading, onRefresh = {
+        forecastViewModel.loadCurrentDayForecast(
+            latitude = latitude,
+            longitude = longitude
+        )
+    })
 
     LaunchedEffect(key1 = currentDayForecastUiState.isLoading, block = {
         forecastViewModel.loadCurrentDayForecast(
@@ -76,55 +86,69 @@ fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: Forec
     })
 
     Scaffold(containerColor = Color(0xff54717A)) {
-        LazyColumn(
+        Box(
             Modifier
                 .fillMaxSize()
                 .padding(it)
-                .testTag("FiveDayForecastColumn")
+                .pullRefresh(pullRefreshState)
         ) {
-            stickyHeader {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Image(
-                        painter = painterResource(id = R.drawable.forest_cloudy),
-                        contentDescription = stringResource(R.string.text_weather_type_image),
-                        modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(Modifier.align(Alignment.Center)) {
-                        Text(
-                            text = currentDayForecastUiState.forecast?.currentTemp.toString()
-                                .plus(context.getString(R.string.degree_symbol)),
-                            fontSize = 52.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 50.dp)
-                        )
+            if (!currentDayForecastUiState.isLoading) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .testTag("FiveDayForecastColumn")
+                ) {
+                    stickyHeader {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Image(
+                                painter = painterResource(id = R.drawable.forest_cloudy),
+                                contentDescription = stringResource(R.string.text_weather_type_image),
+                                modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
+                                contentScale = ContentScale.Crop
+                            )
+                            Column(Modifier.align(Alignment.Center)) {
+                                Text(
+                                    text = currentDayForecastUiState.forecast?.currentTemp.toString()
+                                        .plus(context.getString(R.string.degree_symbol)),
+                                    fontSize = 52.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(start = 50.dp)
+                                )
 
-                        Text(
-                            text = currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
-                            fontSize = 27.sp,
-                            fontWeight = FontWeight.Bold
+                                Text(
+                                    text = currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
+                                    fontSize = 27.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+                        CurrentDayForecastRow(
+                            minTemp = currentDayForecastUiState.forecast?.min.toString(),
+                            currentTemp = currentDayForecastUiState.forecast?.currentTemp.toString(),
+                            maxTemp = currentDayForecastUiState.forecast?.max.toString()
+                        )
+                        Spacer(modifier = Modifier.fillMaxWidth().size(2.dp).background(color = Color.White))
+                    }
+
+                    itemsIndexed(fiveDayForecastUiState.forecasts.take(5)) { i, forecast ->
+                        ForecastRow(
+                            day = getNextFiveDays()[i],
+                            weatherImage = R.drawable.rain,
+                            weatherType = forecast.type,
+                            maxTemp = forecast.max.toString()
                         )
                     }
                 }
             }
 
-            item {
-                CurrentDayForecastRow(
-                    minTemp = currentDayForecastUiState.forecast?.min.toString(),
-                    currentTemp = currentDayForecastUiState.forecast?.currentTemp.toString(),
-                    maxTemp = currentDayForecastUiState.forecast?.max.toString()
-                )
-                Spacer(modifier = Modifier.fillMaxWidth().size(2.dp).background(color = Color.White))
-            }
-
-            itemsIndexed(fiveDayForecastUiState.forecasts.take(5)) { i, forecast ->
-                ForecastRow(
-                    day = getNextFiveDays()[i],
-                    weatherImage = R.drawable.rain,
-                    weatherType = forecast.type,
-                    maxTemp = forecast.max.toString()
-                )
-            }
+            PullRefreshIndicator(
+                refreshing = currentDayForecastUiState.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
