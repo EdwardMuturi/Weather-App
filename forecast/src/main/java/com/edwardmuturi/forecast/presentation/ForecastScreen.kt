@@ -64,18 +64,19 @@ import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: ForecastViewModel = viewModel()) {
+fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     val forecastScreenUiState by forecastViewModel.forecastUiState.collectAsState()
+    val locationState by forecastViewModel.currentLocation.collectAsState()
     val context = LocalContext.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = forecastScreenUiState.isLoading,
-        onRefresh = { forecastViewModel.loadForecast(latitude, longitude) }
+        onRefresh = { forecastViewModel.loadForecast(locationState.latitude, locationState.longitude) }
     )
 
     LaunchedEffect(
         key1 = forecastScreenUiState.isLoading,
         block = {
-            forecastViewModel.loadForecast(latitude, longitude)
+            forecastViewModel.loadForecast(locationState.latitude, locationState.longitude)
         }
     )
 

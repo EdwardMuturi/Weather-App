@@ -20,35 +20,18 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp
+package com.edwardmuturi.weatherapp.storage.location.entity
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
-import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            WeatherAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LocationPermissionLauncher()
-                    ForecastScreen()
-                }
-            }
-        }
-    }
-}
+@Entity
+data class LocationEntity(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+    val latitude: Double?,
+    val longitude: Double?,
+    val name: String?,
+    val isFavourite: Boolean,
+    val isCurrent: Boolean
+)

@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -50,7 +51,7 @@ import com.google.android.gms.location.LocationServices
 import timber.log.Timber
 
 @Composable
-fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current, onLocationUpdated: (LocationDetails) -> Unit) {
+fun LocationPermissionLauncher(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current, locationViewModel: LocationViewModel = viewModel()) {
     val context = LocalContext.current
     var locationRequired = false
     var locationCallback: LocationCallback? = null
@@ -63,8 +64,7 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
             super.onLocationResult(p0)
             for (location in p0.locations) {
                 currentLocation = LocationDetails(location.latitude, location.longitude)
-                onLocationUpdated(currentLocation)
-                Timber.e("sent location $currentLocation")
+                locationViewModel.saveCurrentLocation(currentLocation)
             }
         }
     }
@@ -154,4 +154,4 @@ fun removeLocationUpdates(locationCallback: LocationCallback?, fusedLocationClie
     locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
 }
 
-data class LocationDetails(val latitude: Double, val longitude: Double)
+data class LocationDetails(val latitude: Double?, val longitude: Double?)

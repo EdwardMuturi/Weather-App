@@ -20,35 +20,27 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp
+package com.edwardmuturi.weatherapp.storage
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
-import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Update
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+interface BaseDao<T> {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            WeatherAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LocationPermissionLauncher()
-                    ForecastScreen()
-                }
-            }
-        }
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: T)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vararg items: T)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(items: List<T>)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(item: T)
+
+    @Delete
+    suspend fun delete(item: T)
 }

@@ -20,35 +20,24 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp
+package com.edwardmuturi.weatherapp.storage
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
-import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.edwardmuturi.weatherapp.storage.forecast.dao.ForecastDao
+import com.edwardmuturi.weatherapp.storage.forecast.entity.ForecastEntity
+import com.edwardmuturi.weatherapp.storage.forecast.typeconverter.DateConverter
+import com.edwardmuturi.weatherapp.storage.location.dao.LocationDao
+import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            WeatherAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LocationPermissionLauncher()
-                    ForecastScreen()
-                }
-            }
-        }
-    }
+@Database(
+    entities = [LocationEntity::class, ForecastEntity::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(DateConverter::class)
+abstract class WeatherAppDatabase : RoomDatabase() {
+    abstract fun locationDao(): LocationDao
+    abstract fun forecastDao(): ForecastDao
 }
