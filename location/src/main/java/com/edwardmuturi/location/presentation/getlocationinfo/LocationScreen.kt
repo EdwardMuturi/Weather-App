@@ -159,4 +159,4 @@ fun removeLocationUpdates(locationCallback: LocationCallback?, fusedLocationClie
     locationCallback?.let { fusedLocationClient?.removeLocationUpdates(it) }
 }
 
-data class LocationDetails(val latitude: Double, val longitude: Double)
+data class LocationDetails(val latitude: Double?, val longitude: Double?)

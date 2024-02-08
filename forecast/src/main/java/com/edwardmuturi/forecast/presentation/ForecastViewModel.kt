@@ -32,15 +32,19 @@ import com.edwardmuturi.forecast.domain.usecase.ForecastUiState
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
 import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
 import com.edwardmuturi.location.domain.usecase.GetCurrentLocationUseCase
+import com.edwardmuturi.location.domain.usecase.LocationUiState
+import com.edwardmuturi.location.presentation.getlocationinfo.LocationDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @HiltViewModel
 class ForecastViewModel @Inject constructor(
@@ -48,10 +52,22 @@ class ForecastViewModel @Inject constructor(
     private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase,
     private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
-    val currentLocation = getCurrentLocationUseCase().stateIn(
+    val currentLocation = getCurrentLocationUseCase().map {
+        _forecastUiState.update { fs ->
+//            if (fs.currentLocation.longitude != null && fs.currentLocation.latitude != null) {
+            fs.copy(
+                currentLocation = LocationDetails(
+                    latitude = fs.currentLocation?.latitude,
+                    longitude = fs.currentLocation?.longitude
+                )
+            )
+//            }
+        }
+        it
+    }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = null
+        started = SharingStarted.Lazily,
+        initialValue = LocationUiState()
     )
 
     private val _currentForecastUiState: MutableState<ForecastUiState> = mutableStateOf(ForecastUiState())
@@ -62,7 +78,28 @@ class ForecastViewModel @Inject constructor(
 
     private val _fiveDayForecastUiState: MutableState<FiveDayForecastUiState> = mutableStateOf(FiveDayForecastUiState())
     val fiveDayForecastUiState: State<FiveDayForecastUiState> = _fiveDayForecastUiState
+
+    fun loadCurrentLocation() {
+        viewModelScope.launch {
+            Timber.d("Loading current location")
+            getCurrentLocationUseCase().collectLatest { currentLocation ->
+                if (currentLocation.longitude != null && currentLocation.latitude != null) {
+                    Timber.d("Loading current location success!! $currentLocation")
+                    _forecastUiState.update {
+                        it.copy(
+                            currentLocation = LocationDetails(
+                                latitude = currentLocation.latitude as Double,
+                                longitude = currentLocation.longitude as Double
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun loadForecast(latitude: Double, longitude: Double) {
+        Timber.d("Loading forecast From current location $latitude, $longitude")
         loadCurrentDayForecast(
             latitude = latitude,
             longitude = longitude
@@ -103,6 +140,7 @@ class ForecastViewModel @Inject constructor(
 data class ForecastScreenUiState(
     val currentDayForecastUiState: ForecastUiState = ForecastUiState(),
     val fiveDayForecastUiState: FiveDayForecastUiState = FiveDayForecastUiState(),
+    val currentLocation: LocationDetails? = null,
     val message: String? = null,
     val isLoading: Boolean = false
 )
