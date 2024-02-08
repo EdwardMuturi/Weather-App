@@ -26,14 +26,21 @@ import com.edwardmuturi.location.domain.repository.LocationRepository
 import com.edwardmuturi.weatherapp.storage.location.dao.LocationDao
 import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-class LocationRepositoryImpl @Inject constructor(private val locationDao: LocationDao) : LocationRepository {
+class LocationRepositoryImpl @Inject constructor(private val locationDao: LocationDao) :
+    LocationRepository {
     override suspend fun saveLocation(location: LocationEntity) {
-        locationDao.insert(location)
+        withContext(Dispatchers.IO) { locationDao.insert(location) }
     }
 
-    override fun getCurrentLocation(): Flow<LocationEntity> {
+    override fun getCurrentLocation(): Flow<LocationEntity?> {
         return locationDao.getCurrentLocation()
+    }
+
+    override suspend fun updateLocationDetails(locationEntity: LocationEntity) {
+        withContext(Dispatchers.IO) { locationDao.update(locationEntity) }
     }
 }

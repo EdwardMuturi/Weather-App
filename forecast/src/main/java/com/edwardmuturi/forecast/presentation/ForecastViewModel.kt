@@ -31,19 +31,29 @@ import com.edwardmuturi.forecast.domain.usecase.FiveDayForecastUiState
 import com.edwardmuturi.forecast.domain.usecase.ForecastUiState
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
 import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
+import com.edwardmuturi.location.domain.usecase.GetCurrentLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ForecastViewModel @Inject constructor(
     private val getCurrentWeatherForecastUseCase: GetCurrentWeatherForecastUseCase,
-    private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase
+    private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase,
+    private val getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
+    val currentLocation = getCurrentLocationUseCase().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = null
+    )
+
     private val _currentForecastUiState: MutableState<ForecastUiState> = mutableStateOf(ForecastUiState())
     val currentForecastUiState: State<ForecastUiState> = _currentForecastUiState
 

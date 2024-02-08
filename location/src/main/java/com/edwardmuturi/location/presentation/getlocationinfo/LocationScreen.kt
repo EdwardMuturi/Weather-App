@@ -69,9 +69,6 @@ fun LocationScreen(
             for (location in p0.locations) {
                 currentLocation = LocationDetails(location.latitude, location.longitude)
                 onLocationUpdated(currentLocation)
-                Timber.e("sent location $currentLocation")
-            }
-            if (p0.locations.isNotEmpty()) {
                 locationViewModel.saveCurrentLocation(currentLocation)
             }
         }

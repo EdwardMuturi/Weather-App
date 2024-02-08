@@ -38,7 +38,8 @@ class LocationViewModel @Inject constructor(private val saveLocationUseCase: Sav
             saveLocationUseCase(
                 locationUiState = LocationUiState(
                     longitude = location.longitude,
-                    latitude = location.latitude
+                    latitude = location.latitude,
+                    isCurrent = true
                 )
             )
         }

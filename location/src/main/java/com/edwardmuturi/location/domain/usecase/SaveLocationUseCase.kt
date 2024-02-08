@@ -25,9 +25,14 @@ package com.edwardmuturi.location.domain.usecase
 import com.edwardmuturi.location.domain.repository.LocationRepository
 import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
 
 class SaveLocationUseCase @Inject constructor(private val locationRepository: LocationRepository) {
     suspend operator fun invoke(locationUiState: LocationUiState) {
+        val currentLocation = locationRepository.getCurrentLocation().first()
+        if (currentLocation != null) {
+            locationRepository.updateLocationDetails(currentLocation.copy(isCurrent = false))
+        }
         locationRepository.saveLocation(location = locationUiState.toLocationEntity())
     }
 }
@@ -37,7 +42,8 @@ data class LocationUiState(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val isCurrent: Boolean = false,
-    val isFavourite: Boolean = false
+    val isFavourite: Boolean = false,
+    val message: String? = null
 )
 
 fun LocationUiState.toLocationEntity() = LocationEntity(

@@ -66,16 +66,24 @@ import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 @Composable
 fun ForecastScreen(latitude: Double, longitude: Double, forecastViewModel: ForecastViewModel = viewModel()) {
     val forecastScreenUiState by forecastViewModel.forecastUiState.collectAsState()
+    val locationState by forecastViewModel.currentLocation.collectAsState()
     val context = LocalContext.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = forecastScreenUiState.isLoading,
-        onRefresh = { forecastViewModel.loadForecast(latitude, longitude) }
+        onRefresh = {
+//            forecastViewModel.loadForecast(latitude, longitude)
+            if (locationState?.latitude != null && locationState?.longitude != null) {
+                forecastViewModel.loadForecast(locationState!!.latitude as Double, locationState!!.longitude as Double) // latitude, longitude)
+            }
+        }
     )
 
     LaunchedEffect(
         key1 = forecastScreenUiState.isLoading,
         block = {
-            forecastViewModel.loadForecast(latitude, longitude)
+            if (locationState?.latitude != null && locationState?.longitude != null) {
+                forecastViewModel.loadForecast(locationState!!.latitude as Double, locationState!!.longitude as Double) // latitude, longitude)
+            }
         }
     )
 

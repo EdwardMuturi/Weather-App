@@ -24,20 +24,24 @@ package com.edwardmuturi.location.domain.usecase
 
 import com.edwardmuturi.location.domain.repository.LocationRepository
 import javax.inject.Inject
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
 
 class GetCurrentLocationUseCase @Inject constructor(private val locationRepository: LocationRepository) {
-    operator fun invoke() = flow {
+    operator fun invoke() = channelFlow {
         locationRepository.getCurrentLocation().collectLatest {
-            emit(
-                LocationUiState(
-                    latitude = it.latitude,
-                    longitude = it.longitude,
-                    isCurrent = it.isCurrent,
-                    isFavourite = it.isFavourite
+            if (it != null) {
+                send(
+                    LocationUiState(
+                        latitude = it.latitude,
+                        longitude = it.longitude,
+                        isCurrent = it.isCurrent,
+                        isFavourite = it.isFavourite
+                    )
                 )
-            )
+            } else {
+                send(LocationUiState(message = "Failed to fetch current location"))
+            }
         }
     }
 }

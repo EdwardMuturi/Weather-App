@@ -27,5 +27,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
     suspend fun saveLocation(location: LocationEntity)
-    fun getCurrentLocation(): Flow<LocationEntity>
+    fun getCurrentLocation(): Flow<LocationEntity?>
+    suspend fun updateLocationDetails(locationEntity: LocationEntity)
 }

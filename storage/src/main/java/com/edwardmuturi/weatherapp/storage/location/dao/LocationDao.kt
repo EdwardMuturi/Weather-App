@@ -31,5 +31,5 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM LocationEntity WHERE isCurrent =:isCurrent")
-    fun getCurrentLocation(isCurrent: Boolean = true): Flow<LocationEntity>
+    fun getCurrentLocation(isCurrent: Int = 1): Flow<LocationEntity?>
 }
