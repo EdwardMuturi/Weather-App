@@ -52,11 +52,11 @@ class ForecastViewModel @Inject constructor(
     getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
     val currentLocation = getCurrentLocationUseCase().map {
-        _forecastUiState.update { fs ->
-            fs.copy(
+        _forecastUiState.update { forecastUiState ->
+            forecastUiState.copy(
                 currentLocation = LocationDetails(
-                    latitude = fs.currentLocation?.latitude,
-                    longitude = fs.currentLocation?.longitude
+                    latitude = forecastUiState.currentLocation?.latitude,
+                    longitude = forecastUiState.currentLocation?.longitude
                 ),
                 isLoading = true
             )

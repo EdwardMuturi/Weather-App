@@ -74,7 +74,7 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     )
 
     LaunchedEffect(
-        key1 = forecastScreenUiState.isLoading,
+        key1 = locationState.latitude,
         block = {
             forecastViewModel.loadForecast(locationState.latitude, locationState.longitude)
         }
