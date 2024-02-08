@@ -42,6 +42,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -50,7 +51,11 @@ import com.google.android.gms.location.LocationServices
 import timber.log.Timber
 
 @Composable
-fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current, onLocationUpdated: (LocationDetails) -> Unit) {
+fun LocationScreen(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    locationViewModel: LocationViewModel = viewModel(),
+    onLocationUpdated: (LocationDetails) -> Unit
+) {
     val context = LocalContext.current
     var locationRequired = false
     var locationCallback: LocationCallback? = null
@@ -65,6 +70,9 @@ fun LocationScreen(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
                 currentLocation = LocationDetails(location.latitude, location.longitude)
                 onLocationUpdated(currentLocation)
                 Timber.e("sent location $currentLocation")
+            }
+            if (p0.locations.isNotEmpty()) {
+                locationViewModel.saveCurrentLocation(currentLocation)
             }
         }
     }

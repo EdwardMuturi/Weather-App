@@ -23,8 +23,13 @@
 package com.edwardmuturi.weatherapp.storage.location.dao
 
 import androidx.room.Dao
+import androidx.room.Query
 import com.edwardmuturi.weatherapp.storage.BaseDao
 import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface LocationDao : BaseDao<LocationEntity>
+interface LocationDao : BaseDao<LocationEntity> {
+    @Query("SELECT * FROM LocationEntity WHERE isCurrent =:isCurrent")
+    fun getCurrentLocation(isCurrent: Boolean = true): Flow<LocationEntity>
+}

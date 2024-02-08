@@ -23,9 +23,12 @@
 package com.edwardmuturi.weatherapp.storage
 
 import androidx.room.Database
+import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.edwardmuturi.weatherapp.storage.forecast.dao.ForecastDao
 import com.edwardmuturi.weatherapp.storage.forecast.entity.ForecastEntity
 import com.edwardmuturi.weatherapp.storage.forecast.typeconverter.DateConverter
+import com.edwardmuturi.weatherapp.storage.location.dao.LocationDao
 import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
 
 @Database(
@@ -34,4 +37,7 @@ import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
-abstract class WeatherAppDatabase
+abstract class WeatherAppDatabase : RoomDatabase() {
+    abstract fun locationDao(): LocationDao
+    abstract fun forecastDao(): ForecastDao
+}

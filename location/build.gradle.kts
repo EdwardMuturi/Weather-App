@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.location)
+    implementation(libs.viewmodel.compose)
 
     implementation(libs.appcompat)
 //    implementation(libs.material)

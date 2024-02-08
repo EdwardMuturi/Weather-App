@@ -28,9 +28,9 @@ import androidx.room.PrimaryKey
 @Entity
 data class LocationEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
-    val latitude: Double,
-    val longitude: Double,
+    var id: Int = 0,
+    val latitude: Double?,
+    val longitude: Double?,
     val name: String?,
     val isFavourite: Boolean,
     val isCurrent: Boolean
