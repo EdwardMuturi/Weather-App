@@ -44,29 +44,27 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @HiltViewModel
 class ForecastViewModel @Inject constructor(
     private val getCurrentWeatherForecastUseCase: GetCurrentWeatherForecastUseCase,
     private val getFiveDayWeatherForecastUseCase: GetFiveDayWeatherForecastUseCase,
-    private val getCurrentLocationUseCase: GetCurrentLocationUseCase
+    getCurrentLocationUseCase: GetCurrentLocationUseCase
 ) : ViewModel() {
     val currentLocation = getCurrentLocationUseCase().map {
         _forecastUiState.update { fs ->
-//            if (fs.currentLocation.longitude != null && fs.currentLocation.latitude != null) {
             fs.copy(
                 currentLocation = LocationDetails(
                     latitude = fs.currentLocation?.latitude,
                     longitude = fs.currentLocation?.longitude
-                )
+                ),
+                isLoading = true
             )
-//            }
         }
         it
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Lazily,
+        started = SharingStarted.Eagerly,
         initialValue = LocationUiState()
     )
 
@@ -79,35 +77,17 @@ class ForecastViewModel @Inject constructor(
     private val _fiveDayForecastUiState: MutableState<FiveDayForecastUiState> = mutableStateOf(FiveDayForecastUiState())
     val fiveDayForecastUiState: State<FiveDayForecastUiState> = _fiveDayForecastUiState
 
-    fun loadCurrentLocation() {
-        viewModelScope.launch {
-            Timber.d("Loading current location")
-            getCurrentLocationUseCase().collectLatest { currentLocation ->
-                if (currentLocation.longitude != null && currentLocation.latitude != null) {
-                    Timber.d("Loading current location success!! $currentLocation")
-                    _forecastUiState.update {
-                        it.copy(
-                            currentLocation = LocationDetails(
-                                latitude = currentLocation.latitude as Double,
-                                longitude = currentLocation.longitude as Double
-                            )
-                        )
-                    }
-                }
-            }
+    fun loadForecast(latitude: Double?, longitude: Double?) {
+        if (latitude != null && longitude != null) {
+            loadCurrentDayForecast(
+                latitude = latitude,
+                longitude = longitude
+            )
+            loadFiveDayForecast(
+                latitude = latitude,
+                longitude = longitude
+            )
         }
-    }
-
-    fun loadForecast(latitude: Double, longitude: Double) {
-        Timber.d("Loading forecast From current location $latitude, $longitude")
-        loadCurrentDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
-        loadFiveDayForecast(
-            latitude = latitude,
-            longitude = longitude
-        )
     }
 
     fun loadCurrentDayForecast(latitude: Double, longitude: Double) {

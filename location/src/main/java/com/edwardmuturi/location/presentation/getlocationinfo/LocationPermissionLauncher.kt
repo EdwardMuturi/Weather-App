@@ -51,11 +51,7 @@ import com.google.android.gms.location.LocationServices
 import timber.log.Timber
 
 @Composable
-fun LocationScreen(
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    locationViewModel: LocationViewModel = viewModel(),
-    onLocationUpdated: (LocationDetails) -> Unit
-) {
+fun LocationPermissionLauncher(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current, locationViewModel: LocationViewModel = viewModel()) {
     val context = LocalContext.current
     var locationRequired = false
     var locationCallback: LocationCallback? = null
@@ -68,7 +64,6 @@ fun LocationScreen(
             super.onLocationResult(p0)
             for (location in p0.locations) {
                 currentLocation = LocationDetails(location.latitude, location.longitude)
-                onLocationUpdated(currentLocation)
                 locationViewModel.saveCurrentLocation(currentLocation)
             }
         }

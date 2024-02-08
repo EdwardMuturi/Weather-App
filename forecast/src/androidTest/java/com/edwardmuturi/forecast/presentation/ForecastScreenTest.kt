@@ -26,9 +26,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import com.edwardmuturi.forecast.FakeLocationRepository
 import com.edwardmuturi.forecast.FakerForecastRepository
 import com.edwardmuturi.forecast.domain.usecase.GetCurrentWeatherForecastUseCase
 import com.edwardmuturi.forecast.domain.usecase.GetFiveDayWeatherForecastUseCase
+import com.edwardmuturi.location.domain.usecase.GetCurrentLocationUseCase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,21 +39,19 @@ class ForecastScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
     private val fakerForecastRepository = FakerForecastRepository()
+    private val fakeLocationRepository = FakeLocationRepository()
     private val getFiveDayWeatherForecastUseCase =
         GetFiveDayWeatherForecastUseCase(fakerForecastRepository)
     private val getCurrentWeatherForecastUseCase =
         GetCurrentWeatherForecastUseCase(fakerForecastRepository)
+    private val getCurrentLocationUseCase = GetCurrentLocationUseCase(fakeLocationRepository)
     private val viewModel: ForecastViewModel =
-        ForecastViewModel(getCurrentWeatherForecastUseCase, getFiveDayWeatherForecastUseCase)
+        ForecastViewModel(getCurrentWeatherForecastUseCase, getFiveDayWeatherForecastUseCase, getCurrentLocationUseCase)
 
     @Before
     fun setUp() {
         composeTestRule.setContent {
-            ForecastScreen(
-                latitude = 44.34,
-                longitude = 10.99,
-                forecastViewModel = viewModel
-            )
+            ForecastScreen(forecastViewModel = viewModel)
         }
     }
 

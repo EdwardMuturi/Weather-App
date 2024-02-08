@@ -28,14 +28,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationDetails
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationScreen
+import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
 import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,10 +45,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var currentLocation by remember { mutableStateOf(LocationDetails(0.toDouble(), 0.toDouble())) }
-
-                    LocationScreen { currentLocation = it }
-                    ForecastScreen(latitude = currentLocation.latitude, longitude = currentLocation.longitude)
+                    LocationPermissionLauncher()
+                    ForecastScreen()
                 }
             }
         }
