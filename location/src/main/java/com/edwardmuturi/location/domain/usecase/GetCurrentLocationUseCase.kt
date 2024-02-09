@@ -20,25 +20,28 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.forecast
+package com.edwardmuturi.location.domain.usecase
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
+import com.edwardmuturi.location.domain.repository.LocationRepository
+import javax.inject.Inject
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.edwardmuturi.forecast.test", appContext.packageName)
+class GetCurrentLocationUseCase @Inject constructor(private val locationRepository: LocationRepository) {
+    operator fun invoke() = channelFlow {
+        locationRepository.getCurrentLocation().collectLatest {
+            if (it != null) {
+                send(
+                    LocationUiState(
+                        latitude = it.latitude,
+                        longitude = it.longitude,
+                        isCurrent = it.isCurrent,
+                        isFavourite = it.isFavourite
+                    )
+                )
+            } else {
+                send(LocationUiState(message = "Failed to fetch current location"))
+            }
+        }
     }
 }
