@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.location)
     implementation(libs.viewmodel.compose)
+//    accompanist permissions
+    implementation(libs.compose.permissions)
 
     implementation(libs.appcompat)
 //    implementation(libs.material)

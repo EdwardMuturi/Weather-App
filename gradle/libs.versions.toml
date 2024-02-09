@@ -26,6 +26,8 @@ lifecycle-version = "2.7.0"
 coroutines = "1.8.0-RC2"
 location = "21.1.0"
 room = "2.5.0"
+accompanist-permissions = "0.35.0-alpha"
+lottie = "6.3.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -73,6 +75,10 @@ location = { group = "com.google.android.gms", name = "play-services-location", 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+#Accompanist permissions
+compose-permissions = {module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions"}
+#Lottie
+lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
