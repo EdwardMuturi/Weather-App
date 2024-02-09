@@ -22,9 +22,11 @@
  */
 package com.edwardmuturi.forecast.presentation
 
+import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,13 +46,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.edwardmuturi.forecast.R
 import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
@@ -67,7 +73,6 @@ import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
 fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     val forecastScreenUiState by forecastViewModel.forecastUiState.collectAsState()
     val locationState by forecastViewModel.currentLocation.collectAsState()
-    val context = LocalContext.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = forecastScreenUiState.isLoading,
         onRefresh = { forecastViewModel.loadForecast(locationState.latitude, locationState.longitude) }
@@ -81,75 +86,88 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     )
 
     Scaffold(containerColor = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type)) {
+        StatusBarColor(color = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type))
+
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(it)
                 .pullRefresh(pullRefreshState)
         ) {
-            if (!forecastScreenUiState.isLoading) {
-                LazyColumn(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag("ForecastColumn")
-                ) {
-                    stickyHeader {
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            Image(
-                                painter = painterResource(id = getBackgroundImage(forecastScreenUiState.currentDayForecastUiState.forecast?.type)),
-                                contentDescription = stringResource(R.string.text_weather_type_image),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.TopCenter),
-                                contentScale = ContentScale.Crop
-                            )
-                            Column(Modifier.align(Alignment.Center)) {
-                                Text(
-                                    text = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString()
-                                        .plus(context.getString(R.string.degree_symbol)),
-                                    fontSize = 52.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(start = 50.dp)
-                                )
-
-                                Text(
-                                    text = forecastScreenUiState.currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
-                                    fontSize = 27.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-
-                    item {
-                        CurrentDayForecastRow(
-                            minTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.min.toString(),
-                            currentTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString(),
-                            maxTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.max.toString()
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .size(2.dp)
-                                .background(color = Color.White)
-                        )
-                    }
-
-                    itemsIndexed(forecastScreenUiState.fiveDayForecastUiState.forecasts) { i, forecast ->
-                        ForecastRow(
-                            day = getNextFiveDays()[i],
-                            weatherImage = getWeatherIcon(forecast.type),
-                            weatherType = forecast.type,
-                            maxTemp = forecast.max.toString()
-                        )
-                    }
-                }
-            }
+            ForestScreenContent(forecastScreenUiState)
 
             PullRefreshIndicator(
                 refreshing = forecastScreenUiState.isLoading,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun ForestScreenContent(forecastScreenUiState: ForecastScreenUiState) {
+    if (!forecastScreenUiState.isLoading) {
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .testTag("ForecastColumn")
+        ) {
+            stickyHeader { WeatherTypeImage(forecastScreenUiState) }
+
+            item {
+                CurrentDayForecastRow(
+                    minTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.min.toString(),
+                    currentTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString(),
+                    maxTemp = forecastScreenUiState.currentDayForecastUiState.forecast?.max.toString()
+                )
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(2.dp)
+                        .background(color = Color.White)
+                )
+            }
+
+            itemsIndexed(forecastScreenUiState.fiveDayForecastUiState.forecasts) { i, forecast ->
+                ForecastRow(
+                    day = getNextFiveDays()[i],
+                    weatherImage = getWeatherIcon(forecast.type),
+                    weatherType = forecast.type,
+                    maxTemp = forecast.max.toString()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeatherTypeImage(forecastScreenUiState: ForecastScreenUiState) {
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Image(
+            painter = painterResource(id = getBackgroundImage(forecastScreenUiState.currentDayForecastUiState.forecast?.type)),
+            contentDescription = stringResource(R.string.text_weather_type_image),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter),
+            contentScale = ContentScale.Crop
+        )
+        Column(Modifier.align(Alignment.Center)) {
+            Text(
+                text = forecastScreenUiState.currentDayForecastUiState.forecast?.currentTemp.toString()
+                    .plus(context.getString(R.string.degree_symbol)),
+                fontSize = 52.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 50.dp)
+            )
+
+            Text(
+                text = forecastScreenUiState.currentDayForecastUiState.forecast?.type?.uppercase() ?: "",
+                fontSize = 27.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -229,4 +247,19 @@ private fun getBackgroundImage(weatherType: String?) = when {
     weatherType?.contains("sun", ignoreCase = true) == true -> R.drawable.forest_sunny
     weatherType?.contains("cloud", ignoreCase = true) == true -> R.drawable.forest_cloudy
     else -> R.drawable.forest_cloudy
+}
+
+@Composable
+fun StatusBarColor(color: Color) {
+    val view = LocalView.current
+    val darkTheme = isSystemInDarkTheme()
+
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = color.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
 }
