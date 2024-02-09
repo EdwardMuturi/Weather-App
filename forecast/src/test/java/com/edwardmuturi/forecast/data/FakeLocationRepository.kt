@@ -20,35 +20,21 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp
+import com.edwardmuturi.location.domain.repository.LocationRepository
+import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
-import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
-import dagger.hilt.android.AndroidEntryPoint
+class FakeLocationRepository() : LocationRepository {
+    override suspend fun saveLocation(location: LocationEntity) {
+        TODO("Not yet implemented")
+    }
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+    override fun getCurrentLocation(): Flow<LocationEntity?> {
+        return flow { emit(LocationEntity(name = null, latitude = 44.34, longitude = 10.99, isCurrent = true, isFavourite = false)) }
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            WeatherAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LocationPermissionLauncher()
-                    ForecastScreen()
-                }
-            }
-        }
+    override suspend fun updateLocationDetails(locationEntity: LocationEntity) {
+        TODO("Not yet implemented")
     }
 }

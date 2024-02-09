@@ -6,11 +6,8 @@ plugins {
     alias(libs.plugins.hilt.gradle)
 }
 
-apply(from = "../spotless.gradle")
-apply(from = "../shared.gradle")
-
 android {
-    namespace = "com.edwardmuturi.location"
+    namespace = "com.edwardmuturi.weatherapp.storage"
     compileSdk = 34
 
     defaultConfig {
@@ -23,10 +20,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -36,34 +30,21 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
-    }
 }
 
 dependencies {
-    implementation(project(":storage"))
 
     implementation(libs.core.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
-    implementation(libs.activity.compose)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
-    implementation(libs.location)
-    implementation(libs.viewmodel.compose)
-//    accompanist permissions
-    implementation(libs.compose.permissions)
-
     implementation(libs.appcompat)
-//    implementation(libs.material)
+    implementation(libs.material)
+    // Room
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+    //    Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
-    implementation(libs.location)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

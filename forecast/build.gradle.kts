@@ -47,6 +47,7 @@ android {
 dependencies {
     implementation(project(":network"))
     implementation(project(":location"))
+    implementation(project(":storage"))
 
 //    Compose
     implementation(libs.activity.compose)
@@ -58,6 +59,10 @@ dependencies {
     implementation(libs.lifecycle.compose)
     implementation(libs.viewmodel.compose)
     implementation(libs.material.compose)
+//    lottie
+    implementation(libs.lottie)
+    //    accompanist permissions
+    implementation(libs.compose.permissions)
 
     implementation(libs.core.ktx)
     implementation(libs.viewmodel.scope)

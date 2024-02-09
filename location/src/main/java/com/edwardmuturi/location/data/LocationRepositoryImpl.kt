@@ -20,35 +20,27 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.edwardmuturi.weatherapp
+package com.edwardmuturi.location.data
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.edwardmuturi.forecast.presentation.ForecastScreen
-import com.edwardmuturi.location.presentation.getlocationinfo.LocationPermissionLauncher
-import com.edwardmuturi.weatherapp.ui.theme.WeatherAppTheme
-import dagger.hilt.android.AndroidEntryPoint
+import com.edwardmuturi.location.domain.repository.LocationRepository
+import com.edwardmuturi.weatherapp.storage.location.dao.LocationDao
+import com.edwardmuturi.weatherapp.storage.location.entity.LocationEntity
+import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class LocationRepositoryImpl @Inject constructor(private val locationDao: LocationDao) :
+    LocationRepository {
+    override suspend fun saveLocation(location: LocationEntity) {
+        withContext(Dispatchers.IO) { locationDao.insert(location) }
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            WeatherAppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LocationPermissionLauncher()
-                    ForecastScreen()
-                }
-            }
-        }
+    override fun getCurrentLocation(): Flow<LocationEntity?> {
+        return locationDao.getCurrentLocation()
+    }
+
+    override suspend fun updateLocationDetails(locationEntity: LocationEntity) {
+        withContext(Dispatchers.IO) { locationDao.update(locationEntity) }
     }
 }
