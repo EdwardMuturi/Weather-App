@@ -62,6 +62,7 @@ arrangement and as you move deeper into the package the framework details are gr
   the full power of SQLite
 * Reactive programming (with [Kotlin Coroutines andKotlin Flows](https://kotlinlang.org/docs/reference/coroutines/flow.html))
 * Google [Material 3](https://m3.material.io/) library
+* [Lottie](https://airbnb.io/lottie/#/README) a library for Android, iOS, Web, and Windows that parses Adobe After Effects animations exported as JSON with Bodymovin and renders them natively on mobile and on the web!
 
 ## CI/CD
 
@@ -69,9 +70,9 @@ Github actions
 
 ## Sample Screens
 
- ![Grid Image](docs/cloudy.png) | ![Sort Menu Image](docs/cloudy.png) | ![Details Screen Image](docs/cloudy.png) 
---------------------------------|-------------------------------------|------------------------------------------
- **Cloudy**                     | **Sunny**                           | **Rainy**                                
+ ![Grid Image](docs/cloudy.png) | ![Sort Menu Image](docs/sunny.png) | ![Details Screen Image](docs/rainy.png) 
+--------------------------------|------------------------------------|------------------------------------------
+ **Cloudy**                     | **Sunny**                          | **Rainy**                                
 
 ## App Access
 

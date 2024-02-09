@@ -43,13 +43,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import timber.log.Timber
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationPermissionLauncher(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current, locationViewModel: LocationViewModel = viewModel()) {
     val context = LocalContext.current
@@ -79,49 +80,28 @@ fun LocationPermissionLauncher(lifecycleOwner: LifecycleOwner = LocalLifecycleOw
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
-    val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
+    val locationPermissions = getLocationPermissions()
 
-    if (permissions.all {
+    if (locationPermissions.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
     ) {
         startLocationUpdates(locationRequired = locationRequired, locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
     } else {
         LaunchedEffect(key1 = true, block = {
-            launcherMultiplePermissions.launch(permissions)
+            launcherMultiplePermissions.launch(locationPermissions)
         })
     }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { source, event ->
             when (event) {
-                Lifecycle.Event.ON_CREATE -> {
-                    Timber.d("onCreate")
-                }
-
-                Lifecycle.Event.ON_START -> {
-                    Timber.d("On Start")
-                }
-
                 Lifecycle.Event.ON_RESUME -> {
-                    Timber.d("On Resume")
                     startLocationUpdates(locationRequired, locationCallback, fusedLocationClient)
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
-                    Timber.d("On Pause")
                     removeLocationUpdates(locationCallback = locationCallback, fusedLocationClient = fusedLocationClient)
-                }
-
-                Lifecycle.Event.ON_STOP -> {
-                    Timber.d("On Stop")
-                }
-
-                Lifecycle.Event.ON_DESTROY -> {
-                    Timber.d("On Destroy")
                 }
 
                 else -> {}
@@ -135,6 +115,11 @@ fun LocationPermissionLauncher(lifecycleOwner: LifecycleOwner = LocalLifecycleOw
         }
     }
 }
+
+fun getLocationPermissions() = arrayOf(
+    Manifest.permission.ACCESS_COARSE_LOCATION,
+    Manifest.permission.ACCESS_FINE_LOCATION
+)
 
 @SuppressLint("MissingPermission")
 private fun startLocationUpdates(locationRequired: Boolean, locationCallback: LocationCallback?, fusedLocationClient: FusedLocationProviderClient?) {

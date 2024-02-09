@@ -22,7 +22,11 @@
  */
 package com.edwardmuturi.forecast.presentation
 
+import android.Manifest
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,13 +46,18 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,16 +68,27 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.airbnb.lottie.LottieComposition
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.edwardmuturi.forecast.R
 import com.edwardmuturi.forecast.utils.DateUtils.getNextFiveDays
+import com.edwardmuturi.location.presentation.getlocationinfo.getLocationPermissions
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.MultiplePermissionsState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
     val forecastScreenUiState by forecastViewModel.forecastUiState.collectAsState()
@@ -77,6 +97,10 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
         refreshing = forecastScreenUiState.isLoading,
         onRefresh = { forecastViewModel.loadForecast(locationState.latitude, locationState.longitude) }
     )
+    val backgroundColor = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type)
+    val locationPermissionsState = rememberMultiplePermissionsState(permissions = getLocationPermissions().toList())
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.turn_on_location_lottie))
+    var showRationalDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(
         key1 = locationState.latitude,
@@ -85,8 +109,10 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
         }
     )
 
-    Scaffold(containerColor = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type)) {
-        StatusBarColor(color = BackgroundColor(forecastScreenUiState.currentDayForecastUiState.forecast?.type))
+    PermissionDialog(locationPermissionsState, showRationalDialog) { showRationalDialog = it }
+
+    Scaffold(containerColor = backgroundColor) {
+        StatusBarColor(color = backgroundColor)
 
         Box(
             Modifier
@@ -94,13 +120,57 @@ fun ForecastScreen(forecastViewModel: ForecastViewModel = viewModel()) {
                 .padding(it)
                 .pullRefresh(pullRefreshState)
         ) {
-            ForestScreenContent(forecastScreenUiState)
+            if (locationPermissionsState.allPermissionsGranted) {
+                ForestScreenContent(forecastScreenUiState)
 
-            PullRefreshIndicator(
-                refreshing = forecastScreenUiState.isLoading,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
+                PullRefreshIndicator(
+                    refreshing = forecastScreenUiState.isLoading,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            } else {
+                PermissionRationale(composition, locationPermissionsState) { showDialog -> showRationalDialog = showDialog }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun PermissionRationale(
+    composition: LottieComposition?,
+    locationPermissionsState: MultiplePermissionsState,
+    onShowRationalDialogUpdated: (Boolean) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            Modifier.fillMaxSize().align(Alignment.Center),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever
             )
+            Text(
+                text = "Location permissions not granted, please allow location permissions to view daily forecast",
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp),
+                textAlign = TextAlign.Center
+            )
+            TextButton(
+                onClick = {
+                    onShowRationalDialogUpdated(true)
+                    if (locationPermissionsState.shouldShowRationale) {
+                        onShowRationalDialogUpdated(true)
+                    } else {
+                        locationPermissionsState.launchMultiplePermissionRequest()
+                    }
+                }
+            ) {
+                Text(text = "Allow location permission")
+            }
         }
     }
 }
@@ -261,5 +331,66 @@ fun StatusBarColor(color: Color) {
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun PermissionDialog(
+    locationPermissionsState: MultiplePermissionsState,
+    showRationalDialog: Boolean,
+    onShowRationalDialogUpdated: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
+
+    if (showRationalDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                onShowRationalDialogUpdated(false)
+            },
+            title = {
+                Text(
+                    text = "Permission",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            },
+            text = {
+                Text(
+                    if (locationPermissionsState.revokedPermissions.size == 2) {
+                        "We need location permission to get current location forecast"
+                    } else if (locationPermissionsState.revokedPermissions.first().permission == Manifest.permission.ACCESS_COARSE_LOCATION) {
+                        "We need coarse location permission. Please grant the permission."
+                    } else {
+                        "We need fine location permission. Please grant the permission."
+                    },
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onShowRationalDialogUpdated(false)
+                        val intent = Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", context.packageName, null)
+                        )
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        ContextCompat.startActivity(context, intent, null)
+                    }
+                ) {
+                    Text("OK", style = TextStyle(color = Color.Black))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        onShowRationalDialogUpdated(false)
+                    }
+                ) {
+                    Text("Cancel", style = TextStyle(color = Color.Black))
+                }
+            }
+        )
     }
 }
